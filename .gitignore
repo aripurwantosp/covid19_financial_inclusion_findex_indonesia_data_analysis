@@ -1,0 +1,9 @@
+data/raw
+**/*.dta
+data/*.csv
+data/gcfin1721-final-dataset.rds
+output/backup1/
+output/z_backup/
+syntax/backup1/
+z_backup/
+**/*.ini

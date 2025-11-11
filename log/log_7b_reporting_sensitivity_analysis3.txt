@@ -1,0 +1,374 @@
+
+> # R file for:
+> # Sensitivity analysis 3: svyglm probit adjusted vcov by reported DEff
+> # 
+> # For paper:
+> # Determinants of Financial Inclusion in Indonesia Before and During COVID-19:
+> # Evidence from Global Findex Data
+> # 
+> # Authors of the paper:
+> # Prasetyoputra et al.
+> # 
+> # Code by:
+> # Ari Purwanto Sarwo Prasojo
+> # 
+> # Date of this version:
+> # 2025/10/10
+> 
+> 
+> # initial objects
+> init_obj <- ls()
+
+> # time start, system info
+> time_start <- Sys.time()
+
+> time_start
+[1] "2025-10-14 08:36:11 WIB"
+
+> benchmarkme::get_cpu()
+	 Unable to detect your CPU.
+            Please raise an issue at https://github.com/csgillespie/benchmarkme
+$vendor_id
+[1] NA
+
+$model_name
+[1] NA
+
+$no_of_cores
+[1] 12
+
+
+> benchmarkme::get_ram()
+68.4 GB
+
+> devtools::session_info()
+─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.3.3 (2024-02-29 ucrt)
+ os       Windows 11 x64 (build 26100)
+ system   x86_64, mingw32
+ ui       Rgui
+ language (EN)
+ collate  English_Indonesia.utf8
+ ctype    English_Indonesia.utf8
+ tz       Asia/Jakarta
+ date     2025-10-14
+ pandoc   3.6.3 @ c:\\Program Files\\Positron\\resources\\app\\quarto\\bin\\tools/ (via rmarkdown)
+ quarto   NA @ c:\\PROGRA~1\\Positron\\RESOUR~1\\app\\quarto\\bin\\quarto.exe
+
+─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
+ package           * version    date (UTC) lib source
+ abind               1.4-8      2024-09-12 [1] CRAN (R 4.3.3)
+ askpass             1.2.1      2024-10-04 [1] CRAN (R 4.3.3)
+ backports           1.5.0      2024-05-23 [1] CRAN (R 4.3.3)
+ base64enc           0.1-3      2015-07-28 [1] CRAN (R 4.3.1)
+ benchmarkme         1.0.8      2022-06-12 [1] CRAN (R 4.3.3)
+ benchmarkmeData     1.0.4      2020-04-23 [1] CRAN (R 4.3.3)
+ boot                1.3-29     2024-02-19 [2] CRAN (R 4.3.3)
+ broom             * 1.0.8      2025-03-28 [1] CRAN (R 4.3.3)
+ broom.helpers     * 1.21.0     2025-04-24 [1] CRAN (R 4.3.3)
+ cachem              1.1.0      2024-05-16 [1] CRAN (R 4.3.3)
+ car                 3.1-3      2024-09-27 [1] CRAN (R 4.3.3)
+ carData             3.0-5      2022-01-06 [1] CRAN (R 4.3.3)
+ cards               0.7.0      2025-08-27 [1] CRAN (R 4.3.3)
+ cardx               0.3.0      2025-08-27 [1] CRAN (R 4.3.3)
+ checkmate           2.3.2      2024-07-29 [1] CRAN (R 4.3.3)
+ cli                 3.6.5      2025-04-23 [1] CRAN (R 4.3.3)
+ cluster             2.1.6      2023-12-01 [2] CRAN (R 4.3.3)
+ codetools           0.2-19     2023-02-01 [2] CRAN (R 4.3.3)
+ colorspace          2.1-1      2024-07-26 [1] CRAN (R 4.3.3)
+ commonmark          2.0.0      2025-07-07 [1] CRAN (R 4.3.3)
+ crayon              1.5.3      2024-06-20 [1] CRAN (R 4.3.3)
+ data.table          1.17.8     2025-07-10 [1] CRAN (R 4.3.3)
+ datawizard          1.2.0      2025-07-17 [1] CRAN (R 4.3.3)
+ DBI                 1.2.3      2024-06-02 [1] CRAN (R 4.3.3)
+ devtools            2.4.5      2022-10-11 [1] CRAN (R 4.3.3)
+ digest              0.6.37     2024-08-19 [1] CRAN (R 4.3.3)
+ doParallel          1.0.17     2022-02-07 [1] CRAN (R 4.3.3)
+ dplyr             * 1.1.4      2023-11-17 [1] CRAN (R 4.3.3)
+ ellipsis            0.3.2      2021-04-29 [1] CRAN (R 4.3.3)
+ entropy             1.3.2      2025-04-07 [1] CRAN (R 4.3.3)
+ evaluate            1.0.4      2025-06-18 [1] CRAN (R 4.3.3)
+ farver              2.1.2      2024-05-13 [1] CRAN (R 4.3.3)
+ fastmap             1.2.0      2024-05-15 [1] CRAN (R 4.3.3)
+ flextable         * 0.9.9      2025-05-31 [1] CRAN (R 4.3.3)
+ fontBitstreamVera   0.1.1      2017-02-01 [1] CRAN (R 4.3.1)
+ fontLiberation      0.1.0      2016-10-15 [1] CRAN (R 4.3.1)
+ fontquiver          0.2.1      2017-02-01 [1] CRAN (R 4.3.3)
+ forcats             1.0.0      2023-01-29 [1] CRAN (R 4.3.3)
+ foreach             1.5.2      2022-02-02 [1] CRAN (R 4.3.3)
+ foreign             0.8-86     2023-11-28 [2] CRAN (R 4.3.3)
+ Formula             1.2-5      2023-02-24 [1] CRAN (R 4.3.1)
+ fs                  1.6.6      2025-04-12 [1] CRAN (R 4.3.3)
+ funModeling         1.9.5      2024-04-01 [1] CRAN (R 4.3.3)
+ gdtools             0.4.2      2025-03-27 [1] CRAN (R 4.3.3)
+ generics            0.1.4      2025-05-09 [1] CRAN (R 4.3.3)
+ ggeffects           2.3.1      2025-08-20 [1] CRAN (R 4.3.3)
+ ggplot2           * 3.5.2      2025-04-09 [1] CRAN (R 4.3.3)
+ ggstance            0.3.7      2024-04-05 [1] CRAN (R 4.3.3)
+ ggtext            * 0.1.2      2022-09-16 [1] CRAN (R 4.3.3)
+ ggthemes            5.1.0      2024-02-10 [1] CRAN (R 4.3.3)
+ glmnet              4.1-10     2025-07-17 [1] CRAN (R 4.3.3)
+ glue                1.8.0      2024-09-30 [1] CRAN (R 4.3.3)
+ gridExtra           2.3        2017-09-09 [1] CRAN (R 4.3.3)
+ gridtext            0.1.5      2022-09-16 [1] CRAN (R 4.3.3)
+ gt                  1.1.0      2025-09-23 [1] CRAN (R 4.3.3)
+ gtable              0.3.6      2024-10-25 [1] CRAN (R 4.3.3)
+ gtsummary         * 2.4.0      2025-08-28 [1] CRAN (R 4.3.3)
+ haven             * 2.5.5      2025-05-30 [1] CRAN (R 4.3.3)
+ here              * 1.0.1      2020-12-13 [1] CRAN (R 4.3.3)
+ Hmisc               5.2-3      2025-03-16 [1] CRAN (R 4.3.3)
+ hms                 1.1.3      2023-03-21 [1] CRAN (R 4.3.3)
+ htmlTable           2.4.3      2024-07-21 [1] CRAN (R 4.3.3)
+ htmltools           0.5.8.1    2024-04-04 [1] CRAN (R 4.3.3)
+ htmlwidgets         1.6.4      2023-12-06 [1] CRAN (R 4.3.3)
+ httpuv              1.6.16     2025-04-16 [1] CRAN (R 4.3.3)
+ httr                1.4.7      2023-08-15 [1] CRAN (R 4.3.3)
+ insight             1.4.2      2025-09-02 [1] CRAN (R 4.3.3)
+ iterators           1.0.14     2022-02-05 [1] CRAN (R 4.3.3)
+ jomo                2.7-6      2023-04-15 [1] CRAN (R 4.3.3)
+ knitr               1.50       2025-03-16 [1] CRAN (R 4.3.3)
+ labeling            0.4.3      2023-08-29 [1] CRAN (R 4.3.1)
+ labelled          * 2.14.1     2025-05-06 [1] CRAN (R 4.3.3)
+ later               1.4.2      2025-04-08 [1] CRAN (R 4.3.3)
+ lattice             0.22-5     2023-10-24 [2] CRAN (R 4.3.3)
+ lazyeval            0.2.2      2019-03-15 [1] CRAN (R 4.3.3)
+ lifecycle           1.0.4      2023-11-07 [1] CRAN (R 4.3.3)
+ litedown            0.7        2025-04-08 [1] CRAN (R 4.3.3)
+ lme4                1.1-37     2025-03-26 [1] CRAN (R 4.3.3)
+ magrittr          * 2.0.3      2022-03-30 [1] CRAN (R 4.3.3)
+ marginaleffects   * 0.30.0     2025-09-13 [1] CRAN (R 4.3.3)
+ margins             0.3.28     2024-07-31 [1] CRAN (R 4.3.3)
+ markdown            2.0        2025-03-23 [1] CRAN (R 4.3.3)
+ MASS                7.3-60.0.1 2024-01-13 [2] CRAN (R 4.3.3)
+ mathjaxr            1.8-0      2025-04-30 [1] CRAN (R 4.3.3)
+ Matrix            * 1.6-5      2024-01-11 [2] CRAN (R 4.3.3)
+ memoise             2.0.1      2021-11-26 [1] CRAN (R 4.3.3)
+ mice              * 3.18.0     2025-05-27 [1] CRAN (R 4.3.3)
+ mime                0.13       2025-03-17 [1] CRAN (R 4.3.3)
+ miniUI              0.1.2      2025-04-17 [1] CRAN (R 4.3.3)
+ minqa               1.2.8      2024-08-17 [1] CRAN (R 4.3.3)
+ mitml               0.4-5      2023-03-08 [1] CRAN (R 4.3.3)
+ mitools             2.4        2019-04-26 [1] CRAN (R 4.3.3)
+ moments             0.14.1     2022-05-02 [1] CRAN (R 4.3.1)
+ nlme                3.1-164    2023-11-27 [2] CRAN (R 4.3.3)
+ nloptr              2.2.1      2025-03-17 [1] CRAN (R 4.3.3)
+ nnet                7.3-19     2023-05-03 [2] CRAN (R 4.3.3)
+ officer             0.6.10     2025-05-30 [1] CRAN (R 4.3.3)
+ openssl             2.3.3      2025-05-26 [1] CRAN (R 4.3.3)
+ pan                 1.9        2023-08-21 [1] CRAN (R 4.3.3)
+ pander              0.6.6      2025-03-01 [1] CRAN (R 4.3.3)
+ performance         0.15.0     2025-07-10 [1] CRAN (R 4.3.3)
+ pillar              1.11.0     2025-07-04 [1] CRAN (R 4.3.3)
+ pkgbuild            1.4.8      2025-05-26 [1] CRAN (R 4.3.3)
+ pkgconfig           2.0.3      2019-09-22 [1] CRAN (R 4.3.3)
+ pkgload             1.4.0      2024-06-28 [1] CRAN (R 4.3.3)
+ plyr                1.8.9      2023-10-02 [1] CRAN (R 4.3.3)
+ prediction          0.3.18     2024-06-11 [1] CRAN (R 4.3.3)
+ profvis             0.4.0      2024-09-20 [1] CRAN (R 4.3.3)
+ promises            1.3.3      2025-05-29 [1] CRAN (R 4.3.3)
+ purrr             * 1.1.0      2025-07-10 [1] CRAN (R 4.3.3)
+ R6                  2.6.1      2025-02-15 [1] CRAN (R 4.3.3)
+ ragg                1.4.0      2025-04-10 [1] CRAN (R 4.3.3)
+ rbibutils           2.3        2024-10-04 [1] CRAN (R 4.3.3)
+ RColorBrewer        1.1-3      2022-04-03 [1] CRAN (R 4.3.1)
+ Rcpp                1.1.0      2025-07-02 [1] CRAN (R 4.3.3)
+ Rdpack              2.6.4      2025-04-09 [1] CRAN (R 4.3.3)
+ reformulas          0.4.1      2025-04-30 [1] CRAN (R 4.3.3)
+ remotes             2.5.0      2024-03-17 [1] CRAN (R 4.5.1)
+ reshape2            1.4.4      2020-04-09 [1] CRAN (R 4.3.3)
+ rlang               1.1.6      2025-04-11 [1] CRAN (R 4.3.3)
+ rmarkdown           2.29       2024-11-04 [1] CRAN (R 4.3.3)
+ ROCR                1.0-11     2020-05-02 [1] CRAN (R 4.3.3)
+ rpart               4.1.23     2023-12-05 [2] CRAN (R 4.3.3)
+ rprojroot           2.1.0      2025-07-12 [1] CRAN (R 4.3.3)
+ rstudioapi          0.17.1     2024-10-22 [1] CRAN (R 4.3.3)
+ sandwich            3.1-1      2024-09-15 [1] CRAN (R 4.3.3)
+ sass                0.4.10     2025-04-11 [1] CRAN (R 4.3.3)
+ scales            * 1.4.0      2025-04-24 [1] CRAN (R 4.3.3)
+ sdcLog            * 0.5.1      2025-05-03 [1] CRAN (R 4.3.3)
+ sessioninfo         1.2.3      2025-02-05 [1] CRAN (R 4.3.3)
+ shape               1.4.6.1    2024-02-23 [1] CRAN (R 4.3.2)
+ shiny               1.11.1     2025-07-03 [1] CRAN (R 4.3.3)
+ sjlabelled          1.2.0      2022-04-10 [1] CRAN (R 4.3.3)
+ snakecase           0.11.1     2023-08-27 [1] CRAN (R 4.3.3)
+ stringi             1.8.7      2025-03-27 [1] CRAN (R 4.3.3)
+ stringr           * 1.5.1      2023-11-14 [1] CRAN (R 4.3.3)
+ survey            * 4.4-2      2024-03-20 [1] CRAN (R 4.3.3)
+ survival          * 3.5-8      2024-02-14 [2] CRAN (R 4.3.3)
+ systemfonts         1.2.3      2025-04-30 [1] CRAN (R 4.3.3)
+ textshaping         1.0.1      2025-05-01 [1] CRAN (R 4.3.3)
+ tibble              3.3.0      2025-06-08 [1] CRAN (R 4.3.3)
+ tidyr               1.3.1      2024-01-24 [1] CRAN (R 4.3.3)
+ tidyselect          1.2.1      2024-03-11 [1] CRAN (R 4.3.3)
+ urlchecker          1.0.1      2021-11-30 [1] CRAN (R 4.3.3)
+ usethis             3.1.0      2024-11-26 [1] CRAN (R 4.3.3)
+ utf8                1.2.6      2025-06-08 [1] CRAN (R 4.3.3)
+ uuid                1.2-1      2024-07-29 [1] CRAN (R 4.3.3)
+ vctrs               0.6.5      2023-12-01 [1] CRAN (R 4.3.3)
+ WeightedROC         2020.1.31  2020-02-01 [1] CRAN (R 4.3.3)
+ withr               3.0.2      2024-10-28 [1] CRAN (R 4.3.3)
+ writexl           * 1.5.4      2025-04-15 [1] CRAN (R 4.3.3)
+ xfun                0.52       2025-04-02 [1] CRAN (R 4.3.3)
+ xml2                1.3.8      2025-03-14 [1] CRAN (R 4.3.3)
+ xtable              1.8-4      2019-04-21 [1] CRAN (R 4.3.3)
+ zip                 2.3.3      2025-05-13 [1] CRAN (R 4.3.3)
+ zoo                 1.8-14     2025-04-10 [1] CRAN (R 4.3.3)
+
+ [1] C:/rpackages
+ [2] C:/Program Files/R/R-4.3.3/library
+ * ── Packages attached to the search path.
+
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+> # Saved name ----
+> sv_name <- here(out_path, "ame_sensitivity3.xlsx")
+
+> sv_name2 <- here(mdl_ame_path, "ame_main_sensitivity3.rds")
+
+> sv_name3 <- here(mdl_ame_path, "ame_fintech_sensitivity3.rds")
+
+> # Read data ----
+> 
+> 
+> # Read models ----
+> mdl_account <- readRDS(here(mdl_path, "svyglm_probit_account.rds"))
+
+> mdl_saving <- readRDS(here(mdl_path, "svyglm_probit_saving.rds"))
+
+> mdl_credit <- readRDS(here(mdl_path, "svyglm_probit_credit.rds"))
+
+> mdl_mobintpay <- readRDS(here(mdl_path, "svyglm_probit_mobintpay.rds"))
+
+> mdl_mmoney <- readRDS(here(mdl_path, "svyglm_probit_mmoney.rds"))
+
+> # Reference for variable label ----
+> # note: ref_vars.rds from 6_reporting_ame_main_analysis.R
+> ref_vars <- readRDS(here(mdl_ame_path, "ref_vars.rds"))
+
+> # AME ----
+> ## Main financial inclusion indicators ----
+> # note: utilizing custom functions in utils_fun.R to extract and reshaping results data
+> ame_main <- bind_rows(
++   mod_tidy_num(tidy_ame(ame(mdl_account, vcov = DEvcov))) %>% 
++     mutate(indicator = "Formal account"),
++   mod_tidy_num(tidy_ame(ame(mdl_saving, vcov = DEvcov))) %>% 
++     mutate(indicator = "Formal saving"),
++   mod_tidy_num(tidy_ame(ame(mdl_credit, vcov = DEvcov))) %>% 
++     mutate(indicator = "Formal credit"),
++ )
+
+> # save
+> saveRDS(ame_main, file = sv_name2)
+
+> # to char
+> ame_main <- mod_tidy_char(ame_main)
+
+> # reshaping to wide
+> ame_main_new <- ame_main %>% 
++   mutate(term = factor(term, levels = ref_vars$term)) %>%
++   left_join(ref_vars, by = "term")
+
+> ame_main_wide <- ame_long_to_wide(ame_main_new)
+
+> ## Use of financial technologies ----
+> # DEff adjusted
+> # DE: 2017 = 1.38 & 2021 = 1.42
+> # n: 2017 = 1000 & 2021 = 1062
+> # pooled DE = (n1 * DE1 + n2 * DE2)/(n1 + n2)
+> #           = (1.38 * 1000 + 1.42 * 1062)/(1000 + 1062)
+> #           = 1.400601
+> ame_mobintpay <- ame_mi(mdl_mobintpay)
+
+> ame_mobintpay$variance <- 1.400601 * ame_mobintpay$variance
+
+> ame_fintech <- bind_rows(
++   mod_tidy_num(tidy_ame_mi(ame_mobintpay)) %>% 
++     mutate(indicator = "Payment using Mobile"),
++   mod_tidy_num(tidy_ame(ame(mdl_mmoney, vcov = DEvcov))) %>% 
++     mutate(indicator = "Mobile Money Services")
++ )
+
+> # save
+> saveRDS(ame_fintech, file = sv_name3)
+
+> # to char
+> ame_fintech <- mod_tidy_char(ame_fintech)
+
+> # reshaping to wide
+> ame_fintech_new <- ame_fintech %>% 
++   mutate(term = factor(term, levels = ref_vars$term)) %>%
++   left_join(ref_vars, by = "term")
+
+> ame_fintech_wide <- ame_long_to_wide(ame_fintech_new)
+
+> # Model statistics ----
+> ## Main financial inclusion indicators ----
+> formal_account <- c(
++   n = length(mdl_account$fitted.values),
++   r2_tjur = tjur_r2(mdl_account),
++   au <- auc(mdl_account)
++ )
+
+> formal_saving <- c(
++   n = length(mdl_saving$fitted.values),
++   r2_tjur = tjur_r2(mdl_saving),
++   au <- auc(mdl_saving)
++ )
+
+> formal_credit <- c(
++   n = length(mdl_credit$fitted.values),
++   r2_tjur = tjur_r2(mdl_credit),
++   au <- auc(mdl_credit)
++ )
+
+> mdl_stat_main <- tibble(
++   stat = c("Observations", "Tjur's R2", "AUC"),
++   formal_account = formal_account,
++   formal_saving = formal_saving,
++   formal_credit = formal_credit
++ )
+
+> ## Use of financial technologies ----
+> mob_payment <- c(
++   n = length(mdl_mobintpay[[1]]$fitted.values),
++   r2_tjur = tjur_r2_mi(mdl_mobintpay)[1], #mean
++   au = auc_mi(mdl_mobintpay)[1] #mean
++ )
+
+> mmoney_services <- c(
++   n = length(mdl_mmoney$fitted.values),
++   r2_tjur = tjur_r2(mdl_mmoney),
++   au <- auc(mdl_mmoney)
++ )
+
+> mdl_stat_fintech <- tibble(
++   stat = c("Observations", "Tjur's R2", "AUC"),
++   mob_payment = mob_payment,
++   mmoney_services = mmoney_services,
++ )
+
+> # Save to excel ----
+> write_xlsx(
++   x = list(
++     ame_main = ame_main_wide, 
++     mdl_stat_main = mdl_stat_main,
++     ame_fintech = ame_fintech_wide,
++     mdl_stat_fintech = mdl_stat_fintech
++   ),
++   path = sv_name
++ )
+
+> # time end
+> time_end <- Sys.time()
+
+> time_end
+[1] "2025-10-14 08:36:51 WIB"
+
+> time_exec <- time_end - time_start
+
+> time_exec
+Time difference of 39.82461 secs
+
+> # remove all objects which are created in current r script file
+> rm(list = setdiff(ls(), init_obj))

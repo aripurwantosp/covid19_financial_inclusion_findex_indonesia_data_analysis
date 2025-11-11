@@ -1,0 +1,1039 @@
+
+> # R file for:
+> # Assessing missing data and imputation for mobintpay
+> # 
+> # For paper:
+> # Determinants of Financial Inclusion in Indonesia Before and During COVID-19:
+> # Evidence from Global Findex Data
+> # 
+> # Authors of the paper:
+> # Prasetyoputra et al.
+> # 
+> # Code by:
+> # Ari Purwanto Sarwo Prasojo
+> # 
+> # Date of this version:
+> # 2025/11/06
+> 
+> 
+> # initial objects
+> init_obj <- ls()
+
+> # time start, system info
+> time_start <- Sys.time()
+
+> time_start
+[1] "2025-11-06 08:08:55 WITA"
+
+> benchmarkme::get_cpu()
+$vendor_id
+[1] "AuthenticAMD"
+
+$model_name
+[1] "AMD Ryzen 5 PRO 3500U w/ Radeon Vega Mobile Gfx"
+
+$no_of_cores
+[1] 8
+
+
+> benchmarkme::get_ram()
+14.9 GB
+
+> devtools::session_info()
+─ Session info ─────────────────────────────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.3.3 (2024-02-29 ucrt)
+ os       Windows 10 x64 (build 19045)
+ system   x86_64, mingw32
+ ui       Rgui
+ language (EN)
+ collate  English_Indonesia.utf8
+ ctype    English_Indonesia.utf8
+ tz       Asia/Makassar
+ date     2025-11-06
+ pandoc   3.6.3 @ c:\\Program Files\\Positron\\resources\\app\\quarto\\bin\\tools/ (via rmarkdown)
+ quarto   NA
+
+─ Packages ─────────────────────────────────────────────────────────────────────────────────────────
+ package           * version    date (UTC) lib source
+ askpass             1.2.1      2024-10-04 [1] CRAN (R 4.3.3)
+ backports           1.5.0      2024-05-23 [1] CRAN (R 4.3.3)
+ base64enc           0.1-3      2015-07-28 [1] CRAN (R 4.3.1)
+ benchmarkme         1.0.8      2022-06-12 [1] CRAN (R 4.3.3)
+ benchmarkmeData     1.0.4      2020-04-23 [1] CRAN (R 4.3.3)
+ boot                1.3-29     2024-02-19 [2] CRAN (R 4.3.3)
+ broom             * 1.0.10     2025-09-13 [1] CRAN (R 4.3.3)
+ broom.helpers     * 1.22.0     2025-09-17 [1] CRAN (R 4.3.3)
+ cachem              1.1.0      2024-05-16 [1] CRAN (R 4.3.3)
+ cards               0.7.0      2025-08-27 [1] CRAN (R 4.3.3)
+ cardx               0.3.0      2025-08-27 [1] CRAN (R 4.3.3)
+ checkmate           2.3.3      2025-08-18 [1] CRAN (R 4.3.3)
+ cli                 3.6.5      2025-04-23 [1] CRAN (R 4.3.3)
+ cluster             2.1.6      2023-12-01 [2] CRAN (R 4.3.3)
+ codetools           0.2-19     2023-02-01 [2] CRAN (R 4.3.3)
+ colorspace          2.1-2      2025-09-22 [1] CRAN (R 4.3.3)
+ commonmark          2.0.0      2025-07-07 [1] CRAN (R 4.3.3)
+ data.table          1.17.8     2025-07-10 [1] CRAN (R 4.3.3)
+ DBI                 1.2.3      2024-06-02 [1] CRAN (R 4.3.3)
+ devtools            2.4.6      2025-10-03 [1] CRAN (R 4.3.3)
+ digest              0.6.37     2024-08-19 [1] CRAN (R 4.3.3)
+ doParallel          1.0.17     2022-02-07 [1] CRAN (R 4.3.3)
+ dplyr             * 1.1.4      2023-11-17 [1] CRAN (R 4.3.3)
+ ellipsis            0.3.2      2021-04-29 [1] CRAN (R 4.3.3)
+ entropy             1.3.2      2025-04-07 [1] CRAN (R 4.3.3)
+ evaluate            1.0.5      2025-08-27 [1] CRAN (R 4.3.3)
+ farver              2.1.2      2024-05-13 [1] CRAN (R 4.3.3)
+ fastmap             1.2.0      2024-05-15 [1] CRAN (R 4.3.3)
+ flextable         * 0.9.10     2025-08-24 [1] CRAN (R 4.3.3)
+ fontBitstreamVera   0.1.1      2017-02-01 [1] CRAN (R 4.3.1)
+ fontLiberation      0.1.0      2016-10-15 [1] CRAN (R 4.3.1)
+ fontquiver          0.2.1      2017-02-01 [1] CRAN (R 4.3.3)
+ forcats             1.0.1      2025-09-25 [1] CRAN (R 4.3.3)
+ foreach             1.5.2      2022-02-02 [1] CRAN (R 4.3.3)
+ foreign             0.8-86     2023-11-28 [2] CRAN (R 4.3.3)
+ Formula             1.2-5      2023-02-24 [1] CRAN (R 4.3.1)
+ fs                  1.6.6      2025-04-12 [1] CRAN (R 4.3.3)
+ funModeling         1.9.5      2024-04-01 [1] CRAN (R 4.3.3)
+ gdtools             0.4.4      2025-10-06 [1] CRAN (R 4.3.3)
+ generics            0.1.4      2025-05-09 [1] CRAN (R 4.3.3)
+ ggeffects         * 2.3.1      2025-08-20 [1] CRAN (R 4.3.3)
+ ggplot2           * 4.0.0      2025-09-11 [1] CRAN (R 4.3.3)
+ ggtext            * 0.1.2      2022-09-16 [1] CRAN (R 4.3.3)
+ glmnet              4.1-10     2025-07-17 [1] CRAN (R 4.3.3)
+ glue                1.8.0      2024-09-30 [1] CRAN (R 4.3.3)
+ gridExtra           2.3        2017-09-09 [1] CRAN (R 4.3.3)
+ gridtext            0.1.5      2022-09-16 [1] CRAN (R 4.3.3)
+ gt                  1.1.0      2025-09-23 [1] CRAN (R 4.3.3)
+ gtable              0.3.6      2024-10-25 [1] CRAN (R 4.3.3)
+ gtsummary         * 2.4.0      2025-08-28 [1] CRAN (R 4.3.3)
+ haven             * 2.5.5      2025-05-30 [1] CRAN (R 4.3.3)
+ here              * 1.0.2      2025-09-15 [1] CRAN (R 4.3.3)
+ Hmisc               5.2-4      2025-10-05 [1] CRAN (R 4.3.3)
+ hms                 1.1.4      2025-10-17 [1] CRAN (R 4.3.3)
+ htmlTable           2.4.3      2024-07-21 [1] CRAN (R 4.3.3)
+ htmltools           0.5.8.1    2024-04-04 [1] CRAN (R 4.3.3)
+ htmlwidgets         1.6.4      2023-12-06 [1] CRAN (R 4.3.3)
+ httr                1.4.7      2023-08-15 [1] CRAN (R 4.3.3)
+ insight             1.4.2      2025-09-02 [1] CRAN (R 4.3.3)
+ iterators           1.0.14     2022-02-05 [1] CRAN (R 4.3.3)
+ jomo                2.7-6      2023-04-15 [1] CRAN (R 4.3.3)
+ knitr               1.50       2025-03-16 [1] CRAN (R 4.3.3)
+ labelled          * 2.16.0     2025-10-22 [1] CRAN (R 4.3.3)
+ lattice             0.22-5     2023-10-24 [2] CRAN (R 4.3.3)
+ lazyeval            0.2.2      2019-03-15 [1] CRAN (R 4.3.3)
+ lifecycle           1.0.4      2023-11-07 [1] CRAN (R 4.3.3)
+ litedown            0.7        2025-04-08 [1] CRAN (R 4.3.3)
+ lme4                1.1-37     2025-03-26 [1] CRAN (R 4.3.3)
+ magrittr          * 2.0.4      2025-09-12 [1] CRAN (R 4.3.3)
+ marginaleffects   * 0.30.0     2025-09-13 [1] CRAN (R 4.3.3)
+ markdown            2.0        2025-03-23 [1] CRAN (R 4.3.3)
+ MASS                7.3-60.0.1 2024-01-13 [2] CRAN (R 4.3.3)
+ mathjaxr            1.8-0      2025-04-30 [1] CRAN (R 4.3.3)
+ Matrix            * 1.6-5      2024-01-11 [2] CRAN (R 4.3.3)
+ memoise             2.0.1      2021-11-26 [1] CRAN (R 4.3.3)
+ mice              * 3.18.0     2025-05-27 [1] CRAN (R 4.3.3)
+ minqa               1.2.8      2024-08-17 [1] CRAN (R 4.3.3)
+ mitml               0.4-5      2023-03-08 [1] CRAN (R 4.3.3)
+ mitools             2.4        2019-04-26 [1] CRAN (R 4.3.3)
+ moments             0.14.1     2022-05-02 [1] CRAN (R 4.3.1)
+ nlme                3.1-164    2023-11-27 [2] CRAN (R 4.3.3)
+ nloptr              2.2.1      2025-03-17 [1] CRAN (R 4.3.3)
+ nnet                7.3-19     2023-05-03 [2] CRAN (R 4.3.3)
+ officer             0.7.0      2025-09-03 [1] CRAN (R 4.3.3)
+ openssl             2.3.4      2025-09-30 [1] CRAN (R 4.3.3)
+ pan                 1.9        2023-08-21 [1] CRAN (R 4.3.3)
+ pander              0.6.6      2025-03-01 [1] CRAN (R 4.3.3)
+ patchwork         * 1.3.2      2025-08-25 [1] CRAN (R 4.3.3)
+ pillar              1.11.1     2025-09-17 [1] CRAN (R 4.3.3)
+ pkgbuild            1.4.8      2025-05-26 [1] CRAN (R 4.3.3)
+ pkgconfig           2.0.3      2019-09-22 [1] CRAN (R 4.3.3)
+ pkgload             1.4.1      2025-09-23 [1] CRAN (R 4.3.3)
+ plyr                1.8.9      2023-10-02 [1] CRAN (R 4.3.3)
+ purrr             * 1.1.0      2025-07-10 [1] CRAN (R 4.3.3)
+ R6                  2.6.1      2025-02-15 [1] CRAN (R 4.3.3)
+ ragg                1.5.0      2025-09-02 [1] CRAN (R 4.3.3)
+ rbibutils           2.3        2024-10-04 [1] CRAN (R 4.3.3)
+ RColorBrewer        1.1-3      2022-04-03 [1] CRAN (R 4.3.1)
+ Rcpp                1.1.0      2025-07-02 [1] CRAN (R 4.3.3)
+ Rdpack              2.6.4      2025-04-09 [1] CRAN (R 4.3.3)
+ reformulas          0.4.2      2025-10-28 [1] CRAN (R 4.3.3)
+ remotes             2.5.0      2024-03-17 [1] CRAN (R 4.3.3)
+ reshape2            1.4.4      2020-04-09 [1] CRAN (R 4.3.3)
+ rlang               1.1.6      2025-04-11 [1] CRAN (R 4.3.3)
+ rmarkdown           2.30       2025-09-28 [1] CRAN (R 4.3.3)
+ ROCR                1.0-11     2020-05-02 [1] CRAN (R 4.3.3)
+ rpart               4.1.23     2023-12-05 [2] CRAN (R 4.3.3)
+ rprojroot           2.1.1      2025-08-26 [1] CRAN (R 4.3.3)
+ rstudioapi          0.17.1     2024-10-22 [1] CRAN (R 4.3.3)
+ S7                  0.2.0      2024-11-07 [1] CRAN (R 4.3.3)
+ sass                0.4.10     2025-04-11 [1] CRAN (R 4.3.3)
+ scales            * 1.4.0      2025-04-24 [1] CRAN (R 4.3.3)
+ sdcLog            * 0.5.1      2025-05-03 [1] CRAN (R 4.3.3)
+ sessioninfo         1.2.3      2025-02-05 [1] CRAN (R 4.3.3)
+ shape               1.4.6.1    2024-02-23 [1] CRAN (R 4.3.2)
+ stringi             1.8.7      2025-03-27 [1] CRAN (R 4.3.3)
+ stringr           * 1.5.2      2025-09-08 [1] CRAN (R 4.3.3)
+ survey            * 4.4-8      2025-08-28 [1] CRAN (R 4.3.3)
+ survival          * 3.5-8      2024-02-14 [2] CRAN (R 4.3.3)
+ systemfonts         1.3.1      2025-10-01 [1] CRAN (R 4.3.3)
+ textshaping         1.0.4      2025-10-10 [1] CRAN (R 4.3.3)
+ tibble              3.3.0      2025-06-08 [1] CRAN (R 4.3.3)
+ tidyr               1.3.1      2024-01-24 [1] CRAN (R 4.3.3)
+ tidyselect          1.2.1      2024-03-11 [1] CRAN (R 4.3.3)
+ usethis             3.2.1      2025-09-06 [1] CRAN (R 4.3.3)
+ utf8                1.2.6      2025-06-08 [1] CRAN (R 4.3.3)
+ uuid                1.2-1      2024-07-29 [1] CRAN (R 4.3.3)
+ vctrs               0.6.5      2023-12-01 [1] CRAN (R 4.3.3)
+ withr               3.0.2      2024-10-28 [1] CRAN (R 4.3.3)
+ writexl           * 1.5.4      2025-04-15 [1] CRAN (R 4.3.3)
+ xfun                0.54       2025-10-30 [1] CRAN (R 4.3.3)
+ xml2                1.4.1      2025-10-27 [1] CRAN (R 4.3.3)
+ zip                 2.3.3      2025-05-13 [1] CRAN (R 4.3.3)
+
+ [1] C:/rpackages
+ [2] C:/Program Files/R/R-4.3.3/library
+ * ── Packages attached to the search path.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+> # Saved name ----
+> sv_name <- here(dta_path, "gcfin1721_final_dataset_for_analysis_imp.rds")
+
+> sv_name2 <- here(out_path, "mobintpay_missingness_check_logit.docx")
+
+> # Read data ----
+> df_path <- here(dta_path, "gcfin1721_final_dataset_for_analysis.rds")
+
+> df <- readRDS(df_path)
+
+> df_wave <- df %>% 
++   filter(!is.na(mphone)) %>% 
++   group_split(year2c)
+
+> names(df_wave) <- c("2017","2021")
+
+> # mobintpay: has used mobile phone/internet to make payments ----
+> # check if missing is not MCAR using logit regression
+> # notes:
+> # MCAR - missing completely at random, not MCAR if any significant independent variable
+> # is missing probability depend on individual characteristics?
+> mdl_wave <- map(
++   df_wave,
++   ~{
++     glm(
++       mobintpay_mi ~ female + age + agesq + educ3c + income5c + employed + mphone,
++       data = filter(., acdebit == 1),
++       family = binomial(link="logit")
++     )
++   }
++ )
+
+> map(mdl_wave, ~summary(.))
+$`2017`
+
+Call:
+glm(formula = mobintpay_mi ~ female + age + agesq + educ3c + 
+    income5c + employed + mphone, family = binomial(link = "logit"), 
+    data = filter(., acdebit == 1))
+
+Coefficients:
+                           Estimate Std. Error z value Pr(>|z|)   
+(Intercept)              -2.023e-01  9.381e-01  -0.216  0.82931   
+femaleYes                 2.543e-01  2.482e-01   1.025  0.30552   
+age                      -2.077e-02  4.266e-02  -0.487  0.62632   
+agesq                     1.968e-04  5.090e-04   0.387  0.69899   
+educ3cSecondary          -7.286e-01  2.653e-01  -2.746  0.00604 **
+educ3cTertiary or higher -1.661e+01  7.417e+02  -0.022  0.98214   
+income5cSecond 20%        2.529e-01  4.134e-01   0.612  0.54075   
+income5cThird 20%        -1.905e-01  4.143e-01  -0.460  0.64574   
+income5cFourth 20%       -6.751e-02  4.040e-01  -0.167  0.86726   
+income5cHighest 20%      -3.097e-01  3.880e-01  -0.798  0.42474   
+employedYes              -2.596e-01  2.436e-01  -1.066  0.28657   
+mphoneYes                -2.185e-02  3.897e-01  -0.056  0.95529   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 532.65  on 534  degrees of freedom
+Residual deviance: 502.89  on 523  degrees of freedom
+AIC: 526.89
+
+Number of Fisher Scoring iterations: 16
+
+
+$`2021`
+
+Call:
+glm(formula = mobintpay_mi ~ female + age + agesq + educ3c + 
+    income5c + employed + mphone, family = binomial(link = "logit"), 
+    data = filter(., acdebit == 1))
+
+Coefficients:
+                           Estimate Std. Error z value Pr(>|z|)   
+(Intercept)               1.4984764  1.0655321   1.406   0.1596   
+femaleYes                -0.1879918  0.3088318  -0.609   0.5427   
+age                      -0.0714214  0.0498370  -1.433   0.1518   
+agesq                     0.0006486  0.0006104   1.063   0.2880   
+educ3cSecondary          -0.4828691  0.3751538  -1.287   0.1981   
+educ3cTertiary or higher -1.3675604  1.0909495  -1.254   0.2100   
+income5cSecond 20%        0.4409772  0.3888051   1.134   0.2567   
+income5cThird 20%        -1.0043201  0.4860950  -2.066   0.0388 * 
+income5cFourth 20%       -0.7031442  0.4534384  -1.551   0.1210   
+income5cHighest 20%      -1.4352504  0.5169338  -2.776   0.0055 **
+employedYes              -0.4107518  0.3142342  -1.307   0.1912   
+mphoneYes                -1.0144643  0.3953037  -2.566   0.0103 * 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 381.26  on 578  degrees of freedom
+Residual deviance: 334.08  on 567  degrees of freedom
+AIC: 358.08
+
+Number of Fisher Scoring iterations: 6
+
+
+
+> # report missingnes diagnostic (logistic regression)
+> tbl_reg <- map(mdl_wave,
++   ~{
++     tbl_regression(.,
++       exponentiate = FALSE,
++       estimate_fun = ~ style_number(., digits = 3)
++     ) %>% 
++       add_significance_stars(hide_ci = TRUE, hide_p = TRUE) %>%
++       modify_header(label = "**Variable**") %>% 
++       add_glance_table(include = c(nobs))
++   } 
++ ) 
+
+> tbl_reg_m <- tbl_merge(
++   tbl_reg,
++   tab_spanner = c("**2017**", "**2021**")
++ ) %>% 
++   remove_abbreviation("CI = Confidence Interval") %>%
++   modify_table_styling(
++     columns = label,
++     rows = row_type == "label",
++     text_format = "bold"
++   )
+
+> tbl_reg_m
+
+> tbl_reg_m %>%
++   as_flex_table() %>%
++   font(fontname = "Times New Roman", part = "all") %>%
++   save_as_docx(path = sv_name2)
+
+> # impute mobintpay ----
+> # index or location of missing obervation
+> idx <- map(df_wave,
++   ~{mutate(., row = row_number()) %>% 
++     filter(acdebit == 1 & mobintpay_mi == 1) %>% 
++     pull(row)
++   }
++ )
+
+> # select eligible respondent only
+> df_wave_elig <- map(df_wave, ~filter(., acdebit == 1))
+
+> # index or location of missing obervation in eligible dataset
+> idx_elig <- map(df_wave_elig,
++   ~{mutate(., row = row_number()) %>% 
++     filter(mobintpay_mi == 1) %>% 
++     pull(row)
++   }
++ )
+
+> # select relevant variables
+> df_wave_elig <- map(
++   df_wave_elig, 
++   ~{
++     # log wieght
++     mutate(., logwgt = log(wgt)) %>% 
++     dplyr::select(., 
++       mobintpay, female, age, agesq, educ3c, 
++       income5c, employed, mphone, logwgt
++     )
++   }
++ )
+
+> # make predictor matrix
+> pred_mat <- map(df_wave_elig, ~mice::make.predictorMatrix(.))
+
+> pred_mat[[1]][2:9,] <- 0
+
+> pred_mat[[2]][2:9,] <- 0
+
+> # multiple imputation
+> # notes:
+> # if calculation is not prohibitive, we may set m to the average percentage of
+> # missing data. The substantive conclusions are unlikely to change as a result
+> # of raising m (van Buuren, 2018)
+> m <- 30
+
+> mi_mobintpay <- map2(
++   df_wave_elig,
++   pred_mat,
++   ~mice::mice(
++     .x,
++     m = m,
++     method = "logreg",
++     predictorMatrix = .y,
++     maxit = 10,
++     seed = 1234
++   )
++ )
+
+ iter imp variable
+  1   1  mobintpay
+  1   2  mobintpay
+  1   3  mobintpay
+  1   4  mobintpay
+  1   5  mobintpay
+  1   6  mobintpay
+  1   7  mobintpay
+  1   8  mobintpay
+  1   9  mobintpay
+  1   10  mobintpay
+  1   11  mobintpay
+  1   12  mobintpay
+  1   13  mobintpay
+  1   14  mobintpay
+  1   15  mobintpay
+  1   16  mobintpay
+  1   17  mobintpay
+  1   18  mobintpay
+  1   19  mobintpay
+  1   20  mobintpay
+  1   21  mobintpay
+  1   22  mobintpay
+  1   23  mobintpay
+  1   24  mobintpay
+  1   25  mobintpay
+  1   26  mobintpay
+  1   27  mobintpay
+  1   28  mobintpay
+  1   29  mobintpay
+  1   30  mobintpay
+  2   1  mobintpay
+  2   2  mobintpay
+  2   3  mobintpay
+  2   4  mobintpay
+  2   5  mobintpay
+  2   6  mobintpay
+  2   7  mobintpay
+  2   8  mobintpay
+  2   9  mobintpay
+  2   10  mobintpay
+  2   11  mobintpay
+  2   12  mobintpay
+  2   13  mobintpay
+  2   14  mobintpay
+  2   15  mobintpay
+  2   16  mobintpay
+  2   17  mobintpay
+  2   18  mobintpay
+  2   19  mobintpay
+  2   20  mobintpay
+  2   21  mobintpay
+  2   22  mobintpay
+  2   23  mobintpay
+  2   24  mobintpay
+  2   25  mobintpay
+  2   26  mobintpay
+  2   27  mobintpay
+  2   28  mobintpay
+  2   29  mobintpay
+  2   30  mobintpay
+  3   1  mobintpay
+  3   2  mobintpay
+  3   3  mobintpay
+  3   4  mobintpay
+  3   5  mobintpay
+  3   6  mobintpay
+  3   7  mobintpay
+  3   8  mobintpay
+  3   9  mobintpay
+  3   10  mobintpay
+  3   11  mobintpay
+  3   12  mobintpay
+  3   13  mobintpay
+  3   14  mobintpay
+  3   15  mobintpay
+  3   16  mobintpay
+  3   17  mobintpay
+  3   18  mobintpay
+  3   19  mobintpay
+  3   20  mobintpay
+  3   21  mobintpay
+  3   22  mobintpay
+  3   23  mobintpay
+  3   24  mobintpay
+  3   25  mobintpay
+  3   26  mobintpay
+  3   27  mobintpay
+  3   28  mobintpay
+  3   29  mobintpay
+  3   30  mobintpay
+  4   1  mobintpay
+  4   2  mobintpay
+  4   3  mobintpay
+  4   4  mobintpay
+  4   5  mobintpay
+  4   6  mobintpay
+  4   7  mobintpay
+  4   8  mobintpay
+  4   9  mobintpay
+  4   10  mobintpay
+  4   11  mobintpay
+  4   12  mobintpay
+  4   13  mobintpay
+  4   14  mobintpay
+  4   15  mobintpay
+  4   16  mobintpay
+  4   17  mobintpay
+  4   18  mobintpay
+  4   19  mobintpay
+  4   20  mobintpay
+  4   21  mobintpay
+  4   22  mobintpay
+  4   23  mobintpay
+  4   24  mobintpay
+  4   25  mobintpay
+  4   26  mobintpay
+  4   27  mobintpay
+  4   28  mobintpay
+  4   29  mobintpay
+  4   30  mobintpay
+  5   1  mobintpay
+  5   2  mobintpay
+  5   3  mobintpay
+  5   4  mobintpay
+  5   5  mobintpay
+  5   6  mobintpay
+  5   7  mobintpay
+  5   8  mobintpay
+  5   9  mobintpay
+  5   10  mobintpay
+  5   11  mobintpay
+  5   12  mobintpay
+  5   13  mobintpay
+  5   14  mobintpay
+  5   15  mobintpay
+  5   16  mobintpay
+  5   17  mobintpay
+  5   18  mobintpay
+  5   19  mobintpay
+  5   20  mobintpay
+  5   21  mobintpay
+  5   22  mobintpay
+  5   23  mobintpay
+  5   24  mobintpay
+  5   25  mobintpay
+  5   26  mobintpay
+  5   27  mobintpay
+  5   28  mobintpay
+  5   29  mobintpay
+  5   30  mobintpay
+  6   1  mobintpay
+  6   2  mobintpay
+  6   3  mobintpay
+  6   4  mobintpay
+  6   5  mobintpay
+  6   6  mobintpay
+  6   7  mobintpay
+  6   8  mobintpay
+  6   9  mobintpay
+  6   10  mobintpay
+  6   11  mobintpay
+  6   12  mobintpay
+  6   13  mobintpay
+  6   14  mobintpay
+  6   15  mobintpay
+  6   16  mobintpay
+  6   17  mobintpay
+  6   18  mobintpay
+  6   19  mobintpay
+  6   20  mobintpay
+  6   21  mobintpay
+  6   22  mobintpay
+  6   23  mobintpay
+  6   24  mobintpay
+  6   25  mobintpay
+  6   26  mobintpay
+  6   27  mobintpay
+  6   28  mobintpay
+  6   29  mobintpay
+  6   30  mobintpay
+  7   1  mobintpay
+  7   2  mobintpay
+  7   3  mobintpay
+  7   4  mobintpay
+  7   5  mobintpay
+  7   6  mobintpay
+  7   7  mobintpay
+  7   8  mobintpay
+  7   9  mobintpay
+  7   10  mobintpay
+  7   11  mobintpay
+  7   12  mobintpay
+  7   13  mobintpay
+  7   14  mobintpay
+  7   15  mobintpay
+  7   16  mobintpay
+  7   17  mobintpay
+  7   18  mobintpay
+  7   19  mobintpay
+  7   20  mobintpay
+  7   21  mobintpay
+  7   22  mobintpay
+  7   23  mobintpay
+  7   24  mobintpay
+  7   25  mobintpay
+  7   26  mobintpay
+  7   27  mobintpay
+  7   28  mobintpay
+  7   29  mobintpay
+  7   30  mobintpay
+  8   1  mobintpay
+  8   2  mobintpay
+  8   3  mobintpay
+  8   4  mobintpay
+  8   5  mobintpay
+  8   6  mobintpay
+  8   7  mobintpay
+  8   8  mobintpay
+  8   9  mobintpay
+  8   10  mobintpay
+  8   11  mobintpay
+  8   12  mobintpay
+  8   13  mobintpay
+  8   14  mobintpay
+  8   15  mobintpay
+  8   16  mobintpay
+  8   17  mobintpay
+  8   18  mobintpay
+  8   19  mobintpay
+  8   20  mobintpay
+  8   21  mobintpay
+  8   22  mobintpay
+  8   23  mobintpay
+  8   24  mobintpay
+  8   25  mobintpay
+  8   26  mobintpay
+  8   27  mobintpay
+  8   28  mobintpay
+  8   29  mobintpay
+  8   30  mobintpay
+  9   1  mobintpay
+  9   2  mobintpay
+  9   3  mobintpay
+  9   4  mobintpay
+  9   5  mobintpay
+  9   6  mobintpay
+  9   7  mobintpay
+  9   8  mobintpay
+  9   9  mobintpay
+  9   10  mobintpay
+  9   11  mobintpay
+  9   12  mobintpay
+  9   13  mobintpay
+  9   14  mobintpay
+  9   15  mobintpay
+  9   16  mobintpay
+  9   17  mobintpay
+  9   18  mobintpay
+  9   19  mobintpay
+  9   20  mobintpay
+  9   21  mobintpay
+  9   22  mobintpay
+  9   23  mobintpay
+  9   24  mobintpay
+  9   25  mobintpay
+  9   26  mobintpay
+  9   27  mobintpay
+  9   28  mobintpay
+  9   29  mobintpay
+  9   30  mobintpay
+  10   1  mobintpay
+  10   2  mobintpay
+  10   3  mobintpay
+  10   4  mobintpay
+  10   5  mobintpay
+  10   6  mobintpay
+  10   7  mobintpay
+  10   8  mobintpay
+  10   9  mobintpay
+  10   10  mobintpay
+  10   11  mobintpay
+  10   12  mobintpay
+  10   13  mobintpay
+  10   14  mobintpay
+  10   15  mobintpay
+  10   16  mobintpay
+  10   17  mobintpay
+  10   18  mobintpay
+  10   19  mobintpay
+  10   20  mobintpay
+  10   21  mobintpay
+  10   22  mobintpay
+  10   23  mobintpay
+  10   24  mobintpay
+  10   25  mobintpay
+  10   26  mobintpay
+  10   27  mobintpay
+  10   28  mobintpay
+  10   29  mobintpay
+  10   30  mobintpay
+
+ iter imp variable
+  1   1  mobintpay
+  1   2  mobintpay
+  1   3  mobintpay
+  1   4  mobintpay
+  1   5  mobintpay
+  1   6  mobintpay
+  1   7  mobintpay
+  1   8  mobintpay
+  1   9  mobintpay
+  1   10  mobintpay
+  1   11  mobintpay
+  1   12  mobintpay
+  1   13  mobintpay
+  1   14  mobintpay
+  1   15  mobintpay
+  1   16  mobintpay
+  1   17  mobintpay
+  1   18  mobintpay
+  1   19  mobintpay
+  1   20  mobintpay
+  1   21  mobintpay
+  1   22  mobintpay
+  1   23  mobintpay
+  1   24  mobintpay
+  1   25  mobintpay
+  1   26  mobintpay
+  1   27  mobintpay
+  1   28  mobintpay
+  1   29  mobintpay
+  1   30  mobintpay
+  2   1  mobintpay
+  2   2  mobintpay
+  2   3  mobintpay
+  2   4  mobintpay
+  2   5  mobintpay
+  2   6  mobintpay
+  2   7  mobintpay
+  2   8  mobintpay
+  2   9  mobintpay
+  2   10  mobintpay
+  2   11  mobintpay
+  2   12  mobintpay
+  2   13  mobintpay
+  2   14  mobintpay
+  2   15  mobintpay
+  2   16  mobintpay
+  2   17  mobintpay
+  2   18  mobintpay
+  2   19  mobintpay
+  2   20  mobintpay
+  2   21  mobintpay
+  2   22  mobintpay
+  2   23  mobintpay
+  2   24  mobintpay
+  2   25  mobintpay
+  2   26  mobintpay
+  2   27  mobintpay
+  2   28  mobintpay
+  2   29  mobintpay
+  2   30  mobintpay
+  3   1  mobintpay
+  3   2  mobintpay
+  3   3  mobintpay
+  3   4  mobintpay
+  3   5  mobintpay
+  3   6  mobintpay
+  3   7  mobintpay
+  3   8  mobintpay
+  3   9  mobintpay
+  3   10  mobintpay
+  3   11  mobintpay
+  3   12  mobintpay
+  3   13  mobintpay
+  3   14  mobintpay
+  3   15  mobintpay
+  3   16  mobintpay
+  3   17  mobintpay
+  3   18  mobintpay
+  3   19  mobintpay
+  3   20  mobintpay
+  3   21  mobintpay
+  3   22  mobintpay
+  3   23  mobintpay
+  3   24  mobintpay
+  3   25  mobintpay
+  3   26  mobintpay
+  3   27  mobintpay
+  3   28  mobintpay
+  3   29  mobintpay
+  3   30  mobintpay
+  4   1  mobintpay
+  4   2  mobintpay
+  4   3  mobintpay
+  4   4  mobintpay
+  4   5  mobintpay
+  4   6  mobintpay
+  4   7  mobintpay
+  4   8  mobintpay
+  4   9  mobintpay
+  4   10  mobintpay
+  4   11  mobintpay
+  4   12  mobintpay
+  4   13  mobintpay
+  4   14  mobintpay
+  4   15  mobintpay
+  4   16  mobintpay
+  4   17  mobintpay
+  4   18  mobintpay
+  4   19  mobintpay
+  4   20  mobintpay
+  4   21  mobintpay
+  4   22  mobintpay
+  4   23  mobintpay
+  4   24  mobintpay
+  4   25  mobintpay
+  4   26  mobintpay
+  4   27  mobintpay
+  4   28  mobintpay
+  4   29  mobintpay
+  4   30  mobintpay
+  5   1  mobintpay
+  5   2  mobintpay
+  5   3  mobintpay
+  5   4  mobintpay
+  5   5  mobintpay
+  5   6  mobintpay
+  5   7  mobintpay
+  5   8  mobintpay
+  5   9  mobintpay
+  5   10  mobintpay
+  5   11  mobintpay
+  5   12  mobintpay
+  5   13  mobintpay
+  5   14  mobintpay
+  5   15  mobintpay
+  5   16  mobintpay
+  5   17  mobintpay
+  5   18  mobintpay
+  5   19  mobintpay
+  5   20  mobintpay
+  5   21  mobintpay
+  5   22  mobintpay
+  5   23  mobintpay
+  5   24  mobintpay
+  5   25  mobintpay
+  5   26  mobintpay
+  5   27  mobintpay
+  5   28  mobintpay
+  5   29  mobintpay
+  5   30  mobintpay
+  6   1  mobintpay
+  6   2  mobintpay
+  6   3  mobintpay
+  6   4  mobintpay
+  6   5  mobintpay
+  6   6  mobintpay
+  6   7  mobintpay
+  6   8  mobintpay
+  6   9  mobintpay
+  6   10  mobintpay
+  6   11  mobintpay
+  6   12  mobintpay
+  6   13  mobintpay
+  6   14  mobintpay
+  6   15  mobintpay
+  6   16  mobintpay
+  6   17  mobintpay
+  6   18  mobintpay
+  6   19  mobintpay
+  6   20  mobintpay
+  6   21  mobintpay
+  6   22  mobintpay
+  6   23  mobintpay
+  6   24  mobintpay
+  6   25  mobintpay
+  6   26  mobintpay
+  6   27  mobintpay
+  6   28  mobintpay
+  6   29  mobintpay
+  6   30  mobintpay
+  7   1  mobintpay
+  7   2  mobintpay
+  7   3  mobintpay
+  7   4  mobintpay
+  7   5  mobintpay
+  7   6  mobintpay
+  7   7  mobintpay
+  7   8  mobintpay
+  7   9  mobintpay
+  7   10  mobintpay
+  7   11  mobintpay
+  7   12  mobintpay
+  7   13  mobintpay
+  7   14  mobintpay
+  7   15  mobintpay
+  7   16  mobintpay
+  7   17  mobintpay
+  7   18  mobintpay
+  7   19  mobintpay
+  7   20  mobintpay
+  7   21  mobintpay
+  7   22  mobintpay
+  7   23  mobintpay
+  7   24  mobintpay
+  7   25  mobintpay
+  7   26  mobintpay
+  7   27  mobintpay
+  7   28  mobintpay
+  7   29  mobintpay
+  7   30  mobintpay
+  8   1  mobintpay
+  8   2  mobintpay
+  8   3  mobintpay
+  8   4  mobintpay
+  8   5  mobintpay
+  8   6  mobintpay
+  8   7  mobintpay
+  8   8  mobintpay
+  8   9  mobintpay
+  8   10  mobintpay
+  8   11  mobintpay
+  8   12  mobintpay
+  8   13  mobintpay
+  8   14  mobintpay
+  8   15  mobintpay
+  8   16  mobintpay
+  8   17  mobintpay
+  8   18  mobintpay
+  8   19  mobintpay
+  8   20  mobintpay
+  8   21  mobintpay
+  8   22  mobintpay
+  8   23  mobintpay
+  8   24  mobintpay
+  8   25  mobintpay
+  8   26  mobintpay
+  8   27  mobintpay
+  8   28  mobintpay
+  8   29  mobintpay
+  8   30  mobintpay
+  9   1  mobintpay
+  9   2  mobintpay
+  9   3  mobintpay
+  9   4  mobintpay
+  9   5  mobintpay
+  9   6  mobintpay
+  9   7  mobintpay
+  9   8  mobintpay
+  9   9  mobintpay
+  9   10  mobintpay
+  9   11  mobintpay
+  9   12  mobintpay
+  9   13  mobintpay
+  9   14  mobintpay
+  9   15  mobintpay
+  9   16  mobintpay
+  9   17  mobintpay
+  9   18  mobintpay
+  9   19  mobintpay
+  9   20  mobintpay
+  9   21  mobintpay
+  9   22  mobintpay
+  9   23  mobintpay
+  9   24  mobintpay
+  9   25  mobintpay
+  9   26  mobintpay
+  9   27  mobintpay
+  9   28  mobintpay
+  9   29  mobintpay
+  9   30  mobintpay
+  10   1  mobintpay
+  10   2  mobintpay
+  10   3  mobintpay
+  10   4  mobintpay
+  10   5  mobintpay
+  10   6  mobintpay
+  10   7  mobintpay
+  10   8  mobintpay
+  10   9  mobintpay
+  10   10  mobintpay
+  10   11  mobintpay
+  10   12  mobintpay
+  10   13  mobintpay
+  10   14  mobintpay
+  10   15  mobintpay
+  10   16  mobintpay
+  10   17  mobintpay
+  10   18  mobintpay
+  10   19  mobintpay
+  10   20  mobintpay
+  10   21  mobintpay
+  10   22  mobintpay
+  10   23  mobintpay
+  10   24  mobintpay
+  10   25  mobintpay
+  10   26  mobintpay
+  10   27  mobintpay
+  10   28  mobintpay
+  10   29  mobintpay
+  10   30  mobintpay
+
+> # complete data (subset only)
+> df_imp <- map(
++   mi_mobintpay,
++   ~mice::complete(., action = "all")
++ )
+
+> # complete wave data (append to full data)
+> df_wave_imp <- list(
++   `2017` = rep(list(df_wave[[1]]), m),
++   `2021` = rep(list(df_wave[[2]]), m)
++ )
+
+> # replace missing with imputed
+> for(i in 1:m){
++   df_wave_imp[[1]][[i]]$mobintpay[idx[[1]]] <- df_imp[[1]][[i]]$mobintpay[idx_elig[[1]]]
++   df_wave_imp[[2]][[i]]$mobintpay[idx[[2]]] <- df_imp[[2]][[i]]$mobintpay[idx_elig[[2]]]
++ }
+
+> # pooled
+> df_pooled_imp <- list()
+
+> for(i in 1:m){
++   df_pooled_imp[[i]] <- bind_rows(
++     # 2017
++     df_wave_imp[[1]][[i]],
++     # 2021
++     df_wave_imp[[2]][[i]]
++   )
++ }
+
+> # save
+> saveRDS(df_pooled_imp, file = sv_name)
+
+> # time end
+> time_end <- Sys.time()
+
+> time_end
+[1] "2025-11-06 08:09:15 WITA"
+
+> time_exec <- time_end - time_start
+
+> time_exec
+Time difference of 20.37842 secs
+
+> # remove all objects which are created in current r script file
+> rm(list = setdiff(ls(), init_obj))

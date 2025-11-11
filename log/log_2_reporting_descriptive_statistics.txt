@@ -1,0 +1,514 @@
+
+> # R file for:
+> # Reporting descriptive statistics
+> # 
+> # For paper:
+> # Determinants of Financial Inclusion in Indonesia Before and During COVID-19:
+> # Evidence from Global Findex Data
+> # 
+> # Authors of the paper:
+> # Prasetyoputra et al.
+> # 
+> # Code by:
+> # Ari Purwanto Sarwo Prasojo
+> # 
+> # Date of this version:
+> # 2025/11/05
+> 
+> 
+> # initial objects
+> init_obj <- ls()
+
+> # time start, system info
+> time_start <- Sys.time()
+
+> time_start
+[1] "2025-11-05 17:04:04 WITA"
+
+> benchmarkme::get_cpu()
+$vendor_id
+[1] "AuthenticAMD"
+
+$model_name
+[1] "AMD Ryzen 5 PRO 3500U w/ Radeon Vega Mobile Gfx"
+
+$no_of_cores
+[1] 8
+
+
+> benchmarkme::get_ram()
+14.9 GB
+
+> devtools::session_info()
+─ Session info ─────────────────────────────────────────────────────────────────────────────────────
+ setting  value
+ version  R version 4.3.3 (2024-02-29 ucrt)
+ os       Windows 10 x64 (build 19045)
+ system   x86_64, mingw32
+ ui       Rgui
+ language (EN)
+ collate  English_Indonesia.utf8
+ ctype    English_Indonesia.utf8
+ tz       Asia/Makassar
+ date     2025-11-05
+ pandoc   3.6.3 @ c:\\Program Files\\Positron\\resources\\app\\quarto\\bin\\tools/ (via rmarkdown)
+ quarto   NA
+
+─ Packages ─────────────────────────────────────────────────────────────────────────────────────────
+ package           * version    date (UTC) lib source
+ askpass             1.2.1      2024-10-04 [1] CRAN (R 4.3.3)
+ backports           1.5.0      2024-05-23 [1] CRAN (R 4.3.3)
+ base64enc           0.1-3      2015-07-28 [1] CRAN (R 4.3.1)
+ benchmarkme         1.0.8      2022-06-12 [1] CRAN (R 4.3.3)
+ benchmarkmeData     1.0.4      2020-04-23 [1] CRAN (R 4.3.3)
+ boot                1.3-29     2024-02-19 [2] CRAN (R 4.3.3)
+ broom             * 1.0.10     2025-09-13 [1] CRAN (R 4.3.3)
+ broom.helpers     * 1.22.0     2025-09-17 [1] CRAN (R 4.3.3)
+ cachem              1.1.0      2024-05-16 [1] CRAN (R 4.3.3)
+ cards               0.7.0      2025-08-27 [1] CRAN (R 4.3.3)
+ cardx               0.3.0      2025-08-27 [1] CRAN (R 4.3.3)
+ checkmate           2.3.3      2025-08-18 [1] CRAN (R 4.3.3)
+ cli                 3.6.5      2025-04-23 [1] CRAN (R 4.3.3)
+ cluster             2.1.6      2023-12-01 [2] CRAN (R 4.3.3)
+ codetools           0.2-19     2023-02-01 [2] CRAN (R 4.3.3)
+ colorspace          2.1-2      2025-09-22 [1] CRAN (R 4.3.3)
+ commonmark          2.0.0      2025-07-07 [1] CRAN (R 4.3.3)
+ data.table          1.17.8     2025-07-10 [1] CRAN (R 4.3.3)
+ DBI                 1.2.3      2024-06-02 [1] CRAN (R 4.3.3)
+ devtools            2.4.6      2025-10-03 [1] CRAN (R 4.3.3)
+ digest              0.6.37     2024-08-19 [1] CRAN (R 4.3.3)
+ doParallel          1.0.17     2022-02-07 [1] CRAN (R 4.3.3)
+ dplyr             * 1.1.4      2023-11-17 [1] CRAN (R 4.3.3)
+ ellipsis            0.3.2      2021-04-29 [1] CRAN (R 4.3.3)
+ entropy             1.3.2      2025-04-07 [1] CRAN (R 4.3.3)
+ evaluate            1.0.5      2025-08-27 [1] CRAN (R 4.3.3)
+ farver              2.1.2      2024-05-13 [1] CRAN (R 4.3.3)
+ fastmap             1.2.0      2024-05-15 [1] CRAN (R 4.3.3)
+ flextable         * 0.9.10     2025-08-24 [1] CRAN (R 4.3.3)
+ fontBitstreamVera   0.1.1      2017-02-01 [1] CRAN (R 4.3.1)
+ fontLiberation      0.1.0      2016-10-15 [1] CRAN (R 4.3.1)
+ fontquiver          0.2.1      2017-02-01 [1] CRAN (R 4.3.3)
+ forcats             1.0.1      2025-09-25 [1] CRAN (R 4.3.3)
+ foreach             1.5.2      2022-02-02 [1] CRAN (R 4.3.3)
+ foreign             0.8-86     2023-11-28 [2] CRAN (R 4.3.3)
+ Formula             1.2-5      2023-02-24 [1] CRAN (R 4.3.1)
+ fs                  1.6.6      2025-04-12 [1] CRAN (R 4.3.3)
+ funModeling         1.9.5      2024-04-01 [1] CRAN (R 4.3.3)
+ gdtools             0.4.4      2025-10-06 [1] CRAN (R 4.3.3)
+ generics            0.1.4      2025-05-09 [1] CRAN (R 4.3.3)
+ ggeffects         * 2.3.1      2025-08-20 [1] CRAN (R 4.3.3)
+ ggplot2           * 4.0.0      2025-09-11 [1] CRAN (R 4.3.3)
+ ggtext            * 0.1.2      2022-09-16 [1] CRAN (R 4.3.3)
+ glmnet              4.1-10     2025-07-17 [1] CRAN (R 4.3.3)
+ glue                1.8.0      2024-09-30 [1] CRAN (R 4.3.3)
+ gridExtra           2.3        2017-09-09 [1] CRAN (R 4.3.3)
+ gridtext            0.1.5      2022-09-16 [1] CRAN (R 4.3.3)
+ gt                  1.1.0      2025-09-23 [1] CRAN (R 4.3.3)
+ gtable              0.3.6      2024-10-25 [1] CRAN (R 4.3.3)
+ gtsummary         * 2.4.0      2025-08-28 [1] CRAN (R 4.3.3)
+ haven             * 2.5.5      2025-05-30 [1] CRAN (R 4.3.3)
+ here              * 1.0.2      2025-09-15 [1] CRAN (R 4.3.3)
+ Hmisc               5.2-4      2025-10-05 [1] CRAN (R 4.3.3)
+ hms                 1.1.4      2025-10-17 [1] CRAN (R 4.3.3)
+ htmlTable           2.4.3      2024-07-21 [1] CRAN (R 4.3.3)
+ htmltools           0.5.8.1    2024-04-04 [1] CRAN (R 4.3.3)
+ htmlwidgets         1.6.4      2023-12-06 [1] CRAN (R 4.3.3)
+ httr                1.4.7      2023-08-15 [1] CRAN (R 4.3.3)
+ insight             1.4.2      2025-09-02 [1] CRAN (R 4.3.3)
+ iterators           1.0.14     2022-02-05 [1] CRAN (R 4.3.3)
+ jomo                2.7-6      2023-04-15 [1] CRAN (R 4.3.3)
+ knitr               1.50       2025-03-16 [1] CRAN (R 4.3.3)
+ labelled          * 2.16.0     2025-10-22 [1] CRAN (R 4.3.3)
+ lattice             0.22-5     2023-10-24 [2] CRAN (R 4.3.3)
+ lazyeval            0.2.2      2019-03-15 [1] CRAN (R 4.3.3)
+ lifecycle           1.0.4      2023-11-07 [1] CRAN (R 4.3.3)
+ litedown            0.7        2025-04-08 [1] CRAN (R 4.3.3)
+ lme4                1.1-37     2025-03-26 [1] CRAN (R 4.3.3)
+ magrittr          * 2.0.4      2025-09-12 [1] CRAN (R 4.3.3)
+ marginaleffects   * 0.30.0     2025-09-13 [1] CRAN (R 4.3.3)
+ markdown            2.0        2025-03-23 [1] CRAN (R 4.3.3)
+ MASS                7.3-60.0.1 2024-01-13 [2] CRAN (R 4.3.3)
+ mathjaxr            1.8-0      2025-04-30 [1] CRAN (R 4.3.3)
+ Matrix            * 1.6-5      2024-01-11 [2] CRAN (R 4.3.3)
+ memoise             2.0.1      2021-11-26 [1] CRAN (R 4.3.3)
+ mice              * 3.18.0     2025-05-27 [1] CRAN (R 4.3.3)
+ minqa               1.2.8      2024-08-17 [1] CRAN (R 4.3.3)
+ mitml               0.4-5      2023-03-08 [1] CRAN (R 4.3.3)
+ mitools             2.4        2019-04-26 [1] CRAN (R 4.3.3)
+ moments             0.14.1     2022-05-02 [1] CRAN (R 4.3.1)
+ nlme                3.1-164    2023-11-27 [2] CRAN (R 4.3.3)
+ nloptr              2.2.1      2025-03-17 [1] CRAN (R 4.3.3)
+ nnet                7.3-19     2023-05-03 [2] CRAN (R 4.3.3)
+ officer             0.7.0      2025-09-03 [1] CRAN (R 4.3.3)
+ openssl             2.3.4      2025-09-30 [1] CRAN (R 4.3.3)
+ pan                 1.9        2023-08-21 [1] CRAN (R 4.3.3)
+ pander              0.6.6      2025-03-01 [1] CRAN (R 4.3.3)
+ patchwork         * 1.3.2      2025-08-25 [1] CRAN (R 4.3.3)
+ pillar              1.11.1     2025-09-17 [1] CRAN (R 4.3.3)
+ pkgbuild            1.4.8      2025-05-26 [1] CRAN (R 4.3.3)
+ pkgconfig           2.0.3      2019-09-22 [1] CRAN (R 4.3.3)
+ pkgload             1.4.1      2025-09-23 [1] CRAN (R 4.3.3)
+ plyr                1.8.9      2023-10-02 [1] CRAN (R 4.3.3)
+ purrr             * 1.1.0      2025-07-10 [1] CRAN (R 4.3.3)
+ R6                  2.6.1      2025-02-15 [1] CRAN (R 4.3.3)
+ ragg                1.5.0      2025-09-02 [1] CRAN (R 4.3.3)
+ rbibutils           2.3        2024-10-04 [1] CRAN (R 4.3.3)
+ RColorBrewer        1.1-3      2022-04-03 [1] CRAN (R 4.3.1)
+ Rcpp                1.1.0      2025-07-02 [1] CRAN (R 4.3.3)
+ Rdpack              2.6.4      2025-04-09 [1] CRAN (R 4.3.3)
+ reformulas          0.4.2      2025-10-28 [1] CRAN (R 4.3.3)
+ remotes             2.5.0      2024-03-17 [1] CRAN (R 4.3.3)
+ reshape2            1.4.4      2020-04-09 [1] CRAN (R 4.3.3)
+ rlang               1.1.6      2025-04-11 [1] CRAN (R 4.3.3)
+ rmarkdown           2.30       2025-09-28 [1] CRAN (R 4.3.3)
+ ROCR                1.0-11     2020-05-02 [1] CRAN (R 4.3.3)
+ rpart               4.1.23     2023-12-05 [2] CRAN (R 4.3.3)
+ rprojroot           2.1.1      2025-08-26 [1] CRAN (R 4.3.3)
+ rstudioapi          0.17.1     2024-10-22 [1] CRAN (R 4.3.3)
+ S7                  0.2.0      2024-11-07 [1] CRAN (R 4.3.3)
+ sass                0.4.10     2025-04-11 [1] CRAN (R 4.3.3)
+ scales            * 1.4.0      2025-04-24 [1] CRAN (R 4.3.3)
+ sdcLog            * 0.5.1      2025-05-03 [1] CRAN (R 4.3.3)
+ sessioninfo         1.2.3      2025-02-05 [1] CRAN (R 4.3.3)
+ shape               1.4.6.1    2024-02-23 [1] CRAN (R 4.3.2)
+ stringi             1.8.7      2025-03-27 [1] CRAN (R 4.3.3)
+ stringr           * 1.5.2      2025-09-08 [1] CRAN (R 4.3.3)
+ survey            * 4.4-8      2025-08-28 [1] CRAN (R 4.3.3)
+ survival          * 3.5-8      2024-02-14 [2] CRAN (R 4.3.3)
+ systemfonts         1.3.1      2025-10-01 [1] CRAN (R 4.3.3)
+ textshaping         1.0.4      2025-10-10 [1] CRAN (R 4.3.3)
+ tibble              3.3.0      2025-06-08 [1] CRAN (R 4.3.3)
+ tidyr               1.3.1      2024-01-24 [1] CRAN (R 4.3.3)
+ tidyselect          1.2.1      2024-03-11 [1] CRAN (R 4.3.3)
+ usethis             3.2.1      2025-09-06 [1] CRAN (R 4.3.3)
+ utf8                1.2.6      2025-06-08 [1] CRAN (R 4.3.3)
+ uuid                1.2-1      2024-07-29 [1] CRAN (R 4.3.3)
+ vctrs               0.6.5      2023-12-01 [1] CRAN (R 4.3.3)
+ withr               3.0.2      2024-10-28 [1] CRAN (R 4.3.3)
+ writexl           * 1.5.4      2025-04-15 [1] CRAN (R 4.3.3)
+ xfun                0.54       2025-10-30 [1] CRAN (R 4.3.3)
+ xml2                1.4.1      2025-10-27 [1] CRAN (R 4.3.3)
+ zip                 2.3.3      2025-05-13 [1] CRAN (R 4.3.3)
+
+ [1] C:/rpackages
+ [2] C:/Program Files/R/R-4.3.3/library
+ * ── Packages attached to the search path.
+
+────────────────────────────────────────────────────────────────────────────────────────────────────
+
+> # Saved name ----
+> sv_name <- here(out_path, "table_variable_summary_statistics.docx")
+
+> sv_name2 <- here(out_path, "table_variable_summary_mobintpay.docx")
+
+> # Read data ----
+> df_path <- here(dta_path, "gcfin1721_final_dataset_for_analysis.rds")
+
+> df <- readRDS(df_path)
+
+> # # modify mobintpay (add has not account or debit) showing contditional on acdebit
+> df <- df %>% 
++   mutate(
++     mobintpay_new = case_when(
++       acdebit == 0 ~ 0,
++       is.na(acdebit) ~ 1,
++       mobintpay == "No" ~ 2,
++       mobintpay == "Yes" ~ 3,
++     ),
++     mobintpay_new = factor(
++       mobintpay_new,
++       levels = 0:3,
++       labels = c("Has account or debit: No",
++                  "Has account or debit: Missing",
++                  "No",
++                  "Yes"
++                 )
++     )
++   )
+
+> attr(df$mobintpay_new, "label") <- attr(df$mobintpay, "label")
+
+> # Missing data ----
+> # note:
+> # -variables for all respondents
+> # -NA: "don't know" or "refused"
+> df %>% 
++   dplyr::select(-mobintpay) %>% 
++   funModeling::df_status(.)
+        variable q_zeros p_zeros q_na p_na q_inf p_inf    type unique
+1         year2c       0    0.00    0 0.00     0     0  factor      2
+2    wpid_random       0    0.00    0 0.00     0     0 numeric   2062
+3            wgt       0    0.00    0 0.00     0     0 numeric    857
+4        account       0    0.00    0 0.00     0     0  factor      2
+5      debitcard       0    0.00    4 0.19     0     0  factor      2
+6         saving       0    0.00    0 0.00     0     0  factor      2
+7         credit       0    0.00    0 0.00     0     0  factor      2
+8         mmoney       0    0.00    0 0.00     0     0  factor      2
+9         female       0    0.00    0 0.00     0     0  factor      2
+10           age       0    0.00    0 0.00     0     0 numeric     68
+11         agesq       0    0.00    0 0.00     0     0 numeric     68
+12        educ3c       0    0.00    0 0.00     0     0  factor      3
+13      income5c       0    0.00    0 0.00     0     0  factor      5
+14      employed       0    0.00    0 0.00     0     0  factor      2
+15        mphone       0    0.00    9 0.44     0     0  factor      2
+16     mphone_mi    2053   99.56    0 0.00     0     0 numeric      2
+17  debitcard_mi    2058   99.81    0 0.00     0     0 numeric      2
+18       acdebit     940   45.59    4 0.19     0     0 numeric      2
+19  mobintpay_mi     952   46.17    0 0.00     0     0 numeric      2
+20 mobintpay_new       0    0.00  166 8.05     0     0  factor      4
+
+> # # mphone_mi, acdebit, mobintpay_mi for frequency check
+> # df <- df %>% 
+> #   mutate(
+> #       mphone_mi = ifelse(is.na(mphone), 1, 0),
+> #       # has account or debit card
+> #       acdebit = ifelse(account == "Yes" | debitcard == "Yes", 1 ,0),
+> #       mobintpay_mi = ifelse(is.na(mobintpay), 1, 0)
+> #     )
+> 
+> # frequency of mphone's missing by wave
+> # unweighted
+> df %>% group_by(year2c, mphone) %>% summarise(n = n())
+`summarise()` has grouped output by 'year2c'. You can override using the `.groups` argument.
+# A tibble: 6 × 3
+# Groups:   year2c [2]
+  year2c mphone     n
+  <fct>  <fct>  <int>
+1 2017   No       212
+2 2017   Yes      783
+3 2017   <NA>       5
+4 2021   No       253
+5 2021   Yes      805
+6 2021   <NA>       4
+
+> # weighted
+> design <- svydesign(
++   ids = ~1, 
++   weights = ~wgt, 
++   data = df
++ )
+
+> prop.table(svytable(~year2c + mphone_mi, design = design), 1)
+      mphone_mi
+year2c           0           1
+  2017 0.994886364 0.005113636
+  2021 0.996990216 0.003009784
+
+> # frequency of debitcard's missing by wave
+> # unweighted
+> df %>% group_by(year2c, debitcard) %>% summarise(n = n())
+`summarise()` has grouped output by 'year2c'. You can override using the `.groups` argument.
+# A tibble: 5 × 3
+# Groups:   year2c [2]
+  year2c debitcard     n
+  <fct>  <fct>     <int>
+1 2017   No          636
+2 2017   Yes         360
+3 2017   <NA>          4
+4 2021   No          649
+5 2021   Yes         413
+
+> # weighted
+> prop.table(svytable(~year2c + debitcard_mi, design = design), 1)
+      debitcard_mi
+year2c           0           1
+  2017 0.996680032 0.003319968
+  2021 1.000000000 0.000000000
+
+> # frequency of mobintpay's msising by wave
+> # mobintpay -> if has account or has a debit card
+> # unweighted
+> df %>% group_by(year2c, acdebit) %>% summarise(n = n())
+`summarise()` has grouped output by 'year2c'. You can override using the `.groups` argument.
+# A tibble: 5 × 3
+# Groups:   year2c [2]
+  year2c acdebit     n
+  <fct>    <dbl> <int>
+1 2017         0   459
+2 2017         1   537
+3 2017        NA     4
+4 2021         0   481
+5 2021         1   581
+
+> df %>% filter(acdebit == 1) %>% 
++   group_by(year2c, mobintpay) %>% 
++   summarise(n=n())
+`summarise()` has grouped output by 'year2c'. You can override using the `.groups` argument.
+# A tibble: 6 × 3
+# Groups:   year2c [2]
+  year2c mobintpay     n
+  <fct>  <fct>     <int>
+1 2017   No          353
+2 2017   Yes          77
+3 2017   <NA>        107
+4 2021   No          395
+5 2021   Yes         127
+6 2021   <NA>         59
+
+> # weighted
+> prop.table(svytable(~year2c + mobintpay_mi, design = subset(design, acdebit == 1)), 1)
+      mobintpay_mi
+year2c         0         1
+  2017 0.7851185 0.2148815
+  2021 0.8734102 0.1265898
+
+> # Variable's summary statistics ----
+> # unweighted n
+> tbl_uw <- df %>% 
++   tbl_summary(
++     type = list(all_dichotomous() ~ "categorical"),
++     by = year2c,
++     include = c(account, saving, credit, mobintpay_new, mmoney,
++                 female, age, educ3c, employed, income5c, mphone),
++     statistic = list(all_categorical() ~ "{n} ({p}%)",
++                      all_continuous() ~ "{mean} ({sd})"),
++     digits = list(all_categorical() ~ c(0,2),
++                   all_continuous() ~ 2),
++     missing = "ifany",
++     missing_text = "Missing",
++     missing_stat = "{N_miss} ({p_miss}%)",
++   ) %>% 
++   add_overall(
++     col_label = "**Total**  \nN = {style_number(N)}"
++   )
+
+> # weighted %
+> tbl_w <- design %>% 
++   tbl_svysummary(
++     type = list(all_dichotomous() ~ "categorical"),
++     by = year2c,
++     include = c(account, saving, credit, mobintpay_new, mmoney,
++                 female, age, educ3c, employed, income5c, mphone),
++     statistic = list(all_categorical() ~ "({p}%)",
++                      all_continuous() ~ "{mean} ({sd})"),
++     digits = list(all_categorical() ~ 2,
++                   all_continuous() ~ 2),
++     missing = "ifany",
++     missing_text = "Missing",
++     missing_stat = "({p_miss}%)",
++   ) %>% 
++    add_overall(
++     col_label = "**Total**  \nN = {style_number(N)}"
++   )
+
+> # merge table
+> tbl_m <- tbl_merge(
++   tbls = list(tbl_uw, tbl_w),
++   tab_spanner = c("**Unweighted**", "**Weighted**")
++ ) %>% 
++   modify_header(label ~ "**Variables**") %>%
++   add_variable_group_header(
++     header = "Main indicators of financial inclusion",
++     variables = c(account, saving, credit)
++   ) %>%
++   add_variable_group_header(
++     header = "Financial technology",
++     variables = c(mobintpay_new, mmoney)
++   ) %>% 
++   add_variable_group_header(
++     header = "Explanatory variables",
++     variables = c(female, age, educ3c, employed, income5c, mphone)
++   ) %>% 
++   modify_table_styling(
++     columns = label,
++     rows = row_type %in% c("variable_group", "label"),
++     text_format = "bold"
++   )
+
+> tbl_m
+
+> idx_pad <- which(tbl_m$table_body$row_type %in% c("level", "missing"))
+
+> idx_grp <- which(tbl_m$table_body$row_type == "variable_group")
+
+> # save to docx
+> # document settings
+> sect_prop <- officer::prop_section(
++   page_size = officer::page_size(orient = "landscape")
++ )
+
+> tbl_m %>%
++   as_flex_table() %>%
++   padding(i = idx_pad, j = 1, padding.left = 20) %>% 
++   align(j = -1, align = "right", part = "body") %>% 
++   hline(i = c(idx_grp, idx_grp[-1]-1)) %>% 
++   italic(i = idx_grp, italic = TRUE, part = "body") %>% 
++   font(fontname = "Times New Roman", part = "all") %>%
++   save_as_docx(path = sv_name, pr_section = sect_prop)
+
+> # Mobintpay: subset !is.na(mphone) and acdebit == 1 ----
+> # unweighted n
+> tbl_uw <- df %>%
++   filter(!is.na(mphone), acdebit == 1) %>% 
++   tbl_summary(
++     type = list(all_dichotomous() ~ "categorical"),
++     by = year2c,
++     include = mobintpay,
++     statistic = list(all_categorical() ~ "{n} ({p}%)",
++                      all_continuous() ~ "{mean} ({sd})"),
++     digits = list(all_categorical() ~ c(0,2),
++                   all_continuous() ~ 2),
++     missing = "ifany",
++     missing_text = "Missing",
++     missing_stat = "{N_miss} ({p_miss}%)",
++   ) %>% 
++   add_overall(
++     col_label = "**Total**  \nN = {style_number(N)}"
++   )
+
+> sub_design <- subset(design, !is.na(mphone) & acdebit == 1)
+
+> attr(sub_design$variables$mobintpay, "label") <- attr(df$mobintpay, "label")
+
+> # weighted %
+> tbl_w <- sub_design %>% 
++   tbl_svysummary(
++     type = list(all_dichotomous() ~ "categorical"),
++     by = year2c,
++     include = mobintpay,
++     statistic = list(all_categorical() ~ "({p}%)",
++                      all_continuous() ~ "{mean} ({sd})"),
++     digits = list(all_categorical() ~ 2,
++                   all_continuous() ~ 2),
++     missing = "ifany",
++     missing_text = "Missing",
++     missing_stat = "({p_miss}%)",
++   ) %>% 
++    add_overall(
++     col_label = "**Total**  \nN = {style_number(N)}"
++   )
+
+> # merge table
+> tbl_m <- tbl_merge(
++   tbls = list(tbl_uw, tbl_w),
++   tab_spanner = c("**Unweighted**", "**Weighted**")
++ ) %>% 
++   modify_header(label ~ "**Variable**") %>%
++   modify_table_styling(
++     columns = label,
++     rows = row_type == "label",
++     text_format = "bold"
++   )
+
+> tbl_m
+
+> # save to docx
+> tbl_m %>% 
++   as_flex_table() %>%
++   align(j = -1, align = "right", part = "body") %>% 
++   font(fontname = "Times New Roman", part = "all") %>%
++   save_as_docx(path = sv_name2, pr_section = sect_prop)
+
+> # time end
+> time_end <- Sys.time()
+
+> time_end
+[1] "2025-11-05 17:04:26 WITA"
+
+> time_exec <- time_end - time_start
+
+> time_exec
+Time difference of 22.3412 secs
+
+> # remove all objects which are created in current r script file
+> rm(list = setdiff(ls(), init_obj))
