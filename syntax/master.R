@@ -47,10 +47,10 @@ library(here)
 # Path directory ----
 dta_path <- here("data")
 syn_path <- here("syntax")
-log_path <- here("log")
+log_path <- here("logs")
 mdl_path <- here("models")
 mdl_ame_path <- here(mdl_path, "ame")
-out_path <- here("output")
+out_path <- here("outputs")
 
 # source ----
 source(here(syn_path, "utils_fun.R"))

@@ -7,3 +7,4 @@ output/z_backup/
 syntax/backup1/
 z_backup/
 **/*.ini
+.Rproj.user
